@@ -54,14 +54,12 @@ def main_loop(screen, env):
 		with open('saved_state.txt', 'w') as f:
             		f.write( str(env.bunny.carrot ) )
 
-
 def update_screen(screen, env, message = []):
 	screen.fill(BLACK) # change color later or insert image
 	for _ in range(len(message)):
 		update_text(screen, message, _)
 	env.theEntities.draw(screen)
 	pygame.display.flip()
-
 
 def update_text(screen, message, index, textSize = 20):
 	font = pygame.font.Font(None, textSize)
@@ -75,13 +73,11 @@ def quit_game():
 	pygame.quit()
 	sys.exit()
 
-
 class Environment:
 	def __init__(self):
 
 		self.item_locations = dict.fromkeys([(x,y) for x in range(WIDTH) for y in
 												range(HEIGHT)])
-
 		self.theItems = pygame.sprite.Group() #Sprite list of the bunny and the items
 
 		self.bunny = Bunny()
@@ -105,7 +101,6 @@ def bounce_bunny(bounce_height):
 	#takes in a value from the Bunny class to see how high the bunny character will bounce
 	self.bunny.bounce()
 
-
 def check_collision(bunny, score):
 	#checks if the bunny has collided with an obstacle or carrot by comparing location
 	if abs(self.carrot.rect.centerx) < (BUNNY_SIZE + CARROT_SIZE) and abs(self.carrot.rect.centery - self.bunny.rect.centery) < (BUNNY_SIZE + CARROT_SIZE):
@@ -114,7 +109,6 @@ def check_collision(bunny, score):
 	if abs(self.obstacle.rect.centerx) < (BUNNY_SIZE + CARROT_SIZE) and abs(self.obstacle.rect.centery - self.bunny.rect.centery) < (BUNNY_SIZE + CARROT_SIZE):
 		self.bunny.lives -= 1
 	#Remove obstacle
-
 
 class Entity(pygame.sprite.Sprite):
 	def __init__(self):
@@ -143,6 +137,7 @@ class Item(Entity):
 	def move_item(self):
 		#updates location of obstacles
 		pass
+
 class Carrot(Item):
 	def __init__(self, y):
 		super(Carrot, self).__init__()
@@ -151,12 +146,10 @@ class Carrot(Item):
 		self.rect.centerx = BORDER_SIZE + WIDTH - CARROT_SIZE/2
 		self.rect.centery = y
 
-
 class Obstacle(Item):
 	def __init__(self):
 		super(Obstacle, self).__init__()
 	# tree(different heights), rock, wolf, fire
-
 
 class Tree_Tall(Obstacle):
 	def __init__(self):
@@ -166,13 +159,11 @@ class Tree_Tall(Obstacle):
 		# self.rect.centerx =
 		# self.rect.centery =
 
-
 class Tree_Short(Obstacle):
 	def __init__(self):
 		super(Tree_Short, self).__init__()
 		self.image = pygame.image.load("lemon-tree.png").convert_alpha()
 		self.rect = pygame.Surface([TREE_SIZE, TREE_SIZE]).get_rect()
-
 
 class Rock(Obstacle):
 	def __init__(self):
@@ -181,7 +172,6 @@ class Rock(Obstacle):
 		self.rect = pygame.Surface([ROCK_SIZE, ROCK_SIZE]).get_rect()
 		# self.rect.centerx =
 		# self.rect.centery =
-
 
 class Fire(Obstacle):
 	def __init__(self):
