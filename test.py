@@ -51,6 +51,8 @@ def main_loop(screen, env):
 	event_types = [event.type for event in events]
 	while pygame.QUIT not in event_types:
 		env.place_carrot()
+		env.step()
+
 		# get a random int, if int = 0, then place_obstacle(random_int for which obstacle)
 		num = random.randint(0, 100)
 
@@ -133,7 +135,7 @@ class Environment:
 		x = item.rect.centerx
 		y = item.rect.centery
 		self.item_locations[(x, y)] = Space(x,y)
-		x_new = item.rect.centerx -= 10
+		x_new = x - 10
 		self.item_locations[(x_new, y)] = item
 
 	def remove_item(item):
@@ -226,7 +228,7 @@ class Tree_Tall(Obstacle):
 		self.size = TREE_SIZE
 		self.rect = pygame.Surface([self.size, 2*self.size]).get_rect()
 		self.rect.topleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM - 2*self.size)
-		self.image = pygame.image.load(self.name_of_image).convert_alpha()
+self.image = pygame.image.load(self.name_of_image).convert_alpha()
 		self.image = pygame.transform.smoothscale(self.image, (self.size, 2*self.size))
 
 class Rock(Obstacle):
