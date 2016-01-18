@@ -50,7 +50,10 @@ def main_loop(screen, env):
 	events = pygame.event.get() #Contains entire events
 	event_types = [event.type for event in events]
 	while pygame.QUIT not in event_types:
-		env.place_carrot()
+		env.step(item) for item in env.theCarrots
+env.place_carrot()
+
+
 		# get a random int, if int = 0, then place_obstacle(random_int for which obstacle)
 		num = random.randint(0, 100)
 
@@ -133,7 +136,7 @@ class Environment:
 		x = item.rect.centerx
 		y = item.rect.centery
 		self.item_locations[(x, y)] = Space(x,y)
-		x_new = item.rect.centerx - 10
+		x_new = x - 10
 		self.item_locations[(x_new, y)] = item
 
 	def remove_item(item):
