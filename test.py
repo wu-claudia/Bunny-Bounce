@@ -47,15 +47,13 @@ def main_loop(screen, env):
 	update_screen(screen, env, message)
 	high_score = 0
 
-	events = pygame.event.get() #Contains entire events
-	event_types = [event.type for event in events]
-	while pygame.QUIT not in event_types:
+	while not pygame.QUIT:
 		for item in env.theCarrots:
-			print type(item)
 			env.step(item)
 		for item in env.theObstacles:
 			env.step(item)
-		env.place_carrot()
+			env.place_carrot()
+
 
 		# get a random int, if int = 0, then place_obstacle(random_int for which obstacle)
 		num = random.randint(0, 100)
@@ -73,16 +71,18 @@ def main_loop(screen, env):
 			env.place_obstacle(Wolf())
 
 		update_screen(screen, env, message)
-		pygame.time.wait(500)
+		#pygame.time.wait(500)
 
-"""
+		events = pygame.event.get() #Contains entire events
+		event_types = [event.type for event in events]
 		if pygame.KEYDOWN in event_types:
+			print "KEYDOWN"
 			if events[0].key == pygame.K_SPACE:
-				env.bunny.bounce()
-	if env.bunny.carrot >= high_score:
-		with open('saved_state.txt', 'w') as f:
-			f.write( str(env.bunny.carrot ) )
-			"""
+				print "BOUNCE"
+				env.bunny.bounce_up()
+	# if env.bunny.carrots >= high_score:
+	# 	with open('saved_state.txt', 'w') as f:
+	# 		f.write( str(env.bunny.carrot ) )
 
 def update_screen(screen, env, message = []):
 	screen.fill(BLACK) # change color later or insert image
@@ -140,7 +140,7 @@ class Environment:
 		y = item.rect.centery
 		self.item_locations[(x, y)] = Space(x,y)
 		item.rect.centerx -= 10
-		self.item_locations[(x, y)] = item
+		self.item_locations[(item.rect.centerx, y)] = item
 
 	def remove_item(item):
 		#removes an item from its previous location
@@ -201,9 +201,12 @@ class Bunny(Entity):
 		self.lives = 3
 		self.carrots = 0
 
-	def bounce(self, bunny_height):
+	def bounce_up(self, bunny_height=50):
 		#moves the bunny up
 		self.rect.centery += bunny_height
+
+	def bounce_down(self, bunny_height=50):
+		#moves the bunny down
 		self.rect.centery -= bunny_height
 
 class Obstacle(Entity):
