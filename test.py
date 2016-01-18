@@ -135,11 +135,7 @@ class Environment:
 		x = item.rect.centerx
 		y = item.rect.centery
 		self.item_locations[(x, y)] = Space(x,y)
-<<<<<<< HEAD
 		x_new = x - 10
-=======
-		x_new = item.rect.centerx - 10
->>>>>>> origin/master
 		self.item_locations[(x_new, y)] = item
 
 	def remove_item(item):
