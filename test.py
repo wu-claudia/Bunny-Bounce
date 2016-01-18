@@ -47,7 +47,7 @@ def main_loop(screen, env):
 	update_screen(screen, env, message)
 	high_score = 0
 
-	while not pygame.QUIT:
+	while pygame.QUIT != True:
 		for item in env.theCarrots:
 			env.step(item)
 		for item in env.theObstacles:
@@ -201,13 +201,13 @@ class Bunny(Entity):
 		self.lives = 3
 		self.carrots = 0
 
-	def bounce_up(self, bunny_height=50):
+	def bounce_up(self, bunny_height=25):
 		#moves the bunny up
-		self.rect.centery += bunny_height
-
-	def bounce_down(self, bunny_height=50):
-		#moves the bunny down
 		self.rect.centery -= bunny_height
+
+	def bounce_down(self, bunny_height=25):
+		#moves the bunny down
+		self.rect.centery += bunny_height
 
 class Obstacle(Entity):
 	def __init__(self):
