@@ -139,9 +139,8 @@ class Environment:
 		x = item.rect.centerx
 		y = item.rect.centery
 		self.item_locations[(x, y)] = Space(x,y)
-		x_new = x - 100
-		x_new = item.rect.centerx - 100
-		self.item_locations[(x_new, y)] = item
+		item.rect.centerx -= 10
+		self.item_locations[(x, y)] = item
 
 	def remove_item(item):
 		#removes an item from its previous location
