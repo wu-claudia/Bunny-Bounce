@@ -201,9 +201,11 @@ class Tree_Tall(Obstacle):
 		super(Tree_Tall, self).__init__()
 		self.name_of_image = "apple-tree.png"
 		self.size = TREE_SIZE
-		self.rect = pygame.Surface([TREE_SIZE, 2*TREE_SIZE]).get_rect()
+		#self.rect = pygame.Surface([self.size, 2*self.size]).get_rect()
 		self.rect.centery = BOTTOM-TREE_SIZE
-		self.set_pic()
+		#self.set_pic()
+		self.image = pygame.image.load(self.name_of_image).convert_alpha()
+		self.image = pygame.transform.smoothscale(self.image, (self.size, 2*self.size))
 
 class Tree_Short(Obstacle):
 	def __init__(self):
