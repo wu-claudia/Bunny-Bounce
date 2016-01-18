@@ -50,8 +50,12 @@ def main_loop(screen, env):
 	events = pygame.event.get() #Contains entire events
 	event_types = [event.type for event in events]
 	while pygame.QUIT not in event_types:
+		for item in env.theCarrots:
+			print type(item)
+			env.step(item)
+		for item in env.theObstacles:
+			env.step(item)
 		env.place_carrot()
-		env.step()
 
 		# get a random int, if int = 0, then place_obstacle(random_int for which obstacle)
 		num = random.randint(0, 100)
