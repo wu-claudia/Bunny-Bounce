@@ -229,7 +229,7 @@ class Tree_Tall(Obstacle):
 		self.size = TREE_SIZE
 		self.rect = pygame.Surface([self.size, 2*self.size]).get_rect()
 		self.rect.topleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM - 2*self.size)
-self.image = pygame.image.load(self.name_of_image).convert_alpha()
+		self.image = pygame.image.load(self.name_of_image).convert_alpha()
 		self.image = pygame.transform.smoothscale(self.image, (self.size, 2*self.size))
 
 class Rock(Obstacle):
