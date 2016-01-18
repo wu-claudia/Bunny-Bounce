@@ -131,7 +131,7 @@ class Environment:
 		self.item_locations[(x, y)] = obstacle
 		self.theObstacles.add(obstacle)
 
-	def step(item):
+	def step(self, item):
 		x = item.rect.centerx
 		y = item.rect.centery
 		self.item_locations[(x, y)] = Space(x,y)
