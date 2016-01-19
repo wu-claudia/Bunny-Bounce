@@ -18,6 +18,7 @@ ROCK_SIZE = 25
 FIRE_SIZE = 50
 WOLF_SIZE = 75
 BOTTOM = HEIGHT * 4/5
+BOUNCE_HEIGHT = 10
 
 # RGB Color Definitions
 BLACK = (0, 0, 0)
@@ -47,36 +48,83 @@ def main_loop(screen, env):
         update_screen(screen, env, message)
         high_score = 0
 
-        events = pygame.event.get() #Contains entire events
-        event_types = [event.type for event in events]
-        while pygame.QUIT not in event_types:
-                env.place_carrot()
-                # get a random int, if int = 0, then place_obstacle(random_int for which obstacle)
-                num = random.randint(0, 100)
+        loop_count = 0
+        bounce_count = 0
+        height = BOUNCE_HEIGHT
 
-                #Random chances of obstacles appearing
-                if num in range(0, 10):
-                        env.place_obstacle(Tree_Tall())
-                elif num in range(10, 15):
-                        env.place_obstacle(Tree_Short())
-                elif num in range(15, 30):
-                        env.place_obstacle(Rock())
-                elif num in range(30, 35):
-                        env.place_obstacle(Fire())
-                elif num in range(35, 45):
-                        env.place_obstacle(Wolf())
+        while end == False:
 
-                update_screen(screen, env, message)
-                pygame.time.wait(500)
+                """
+                Every iteration of the loop: move all carrots and obstacles to the left.
+                Bunny bounce movement.
+                Check for user input.
+                """
 
-"""
+                # Move all items to the left.
+                for item in env.theCarrots:
+                        env.step(item) 
+                for item in env.theObstacles:
+                        env.step(item)
+
+                # Remove items that have reached the left side of the screen.
+                for carrot in env.theCarrots:
+                        if carrot.rect.left < BORDER_SIZE:
+                                env.remove_carrot(carrot)
+                for obstacle in env.theObstacles:
+                        if obstacle.rect.left < BORDER_SIZE:
+                                env.remove_obstacle(obstacle)
+
+                # Bounce movement
+                env.bunny.bounce(bounce_count, height)
+                bounce_count = (bounce_count+1) % height
+
+                # Check for user input and respond accordingly.
+                events = pygame.event.get() #Contains entire events
+                event_types = [event.type for event in events]
                 if pygame.KEYDOWN in event_types:
                         if events[0].key == pygame.K_SPACE:
-                                env.bunny.bounce()
-        if env.bunny.carrot >= high_score:
-                with open('saved_state.txt', 'w') as f:
-                        f.write( str(env.bunny.carrot ) )
-                        """
+                                if height < 6*BOUNCE_HEIGHT:
+                                        height += BOUNCE_HEIGHT
+
+
+                """
+                Every 10 iterations of the loop: place a carrot and randomly place an obstacle
+                """
+
+                if loop_count % 10 == 0:
+                        
+                        env.place_carrot(Carrot())
+
+                        # get a random int, if int = 0, then place obstacle (random_int for which obstacle)
+                        num = random.randint(0, 100)
+
+                        #Random chances of obstacles appearing
+                        if num in range(0, 5):
+                                env.place_obstacle(Tree_Tall())
+                        elif num in range(5, 10):
+                                env.place_obstacle(Tree_Short())
+                        elif num in range(10, 20):
+                                env.place_obstacle(Rock())
+                        elif num in range(20, 25):
+                                env.place_obstacle(Fire())
+                        elif num in range(25, 35):
+                                env.place_obstacle(Wolf())
+
+                update_screen(screen, env, message)
+
+                loop_count += 1
+
+                events = pygame.event.get() #Contains entire events
+                event_types = [event.type for event in events]
+                if pygame.QUIT in event_types:
+                        end = True
+
+        message = ["Hello"]
+        update_screen(screen, env, message)
+
+                # if env.bunny.carrots >= high_score:
+        #       with open('saved_state.txt', 'w') as f:
+        #               f.write( str(env.bunny.carrot ) )
 
 def update_screen(screen, env, message = []):
         screen.fill(BLACK) # change color later or insert image
@@ -101,39 +149,46 @@ def quit_game():
         sys.exit()
 
 class Environment:
+        
         def __init__(self):
                 # Initialize dictionary of locations with objects
                 self.item_locations = dict.fromkeys([(x,y) for x in range(WIDTH) for y in range(HEIGHT)], Space(x,y))
 
-                #Sprite list of all entities
+                # Sprite list of all entities
                 self.theCarrots = pygame.sprite.Group()
                 self.theObstacles = pygame.sprite.Group()
                 self.theBunny = pygame.sprite.Group()
 
                 # Add the bunny
                 self.bunny = Bunny()
+                self.item_locations[self.bunny.rect.bottomleft] = self.bunny
                 self.theBunny.add(self.bunny)
-                self.item_locations[(self.bunny.rect.centerx, self.bunny.rect.centery)] = 'None'
-                self.bunny
 
-        def place_carrot(self):
-                carrot = Carrot()
-                x = carrot.rect.centerx
-                y = carrot.rect.centery
-                self.item_locations[(x, y)] = carrot
+        def place_carrot(self, carrot):
+                self.item_locations[carrot.rect.bottomleft] = carrot
                 self.theCarrots.add(carrot)
 
         def place_obstacle(self, obstacle):
-                x = obstacle.rect.centerx
-                y = obstacle.rect.centery
-                self.item_locations[(x, y)] = obstacle
+                self.item_locations[obstacle.rect.bottomleft] = obstacle
                 self.theObstacles.add(obstacle)
-
-        def remove_item(item):
-                #removes an item from its previous location
-                x = item.rect.centerx
-                y = item.rect.centery
+        
+        def step(self, item):
+                (x, y) = item.rect.bottomleft
+                self.item_locations[(x, y)] = Space(x,y)
+                item.rect.left -= 5
+                self.item_locations[(item.rect.left, y)] = item
+                
+        def remove_carrot(self, carrot):
+                (x, y) = carrot.rect.bottomleft
+                self.theCarrots.remove(carrot)
                 self.item_locations[(x, y)] = Space(x, y)
+
+        def remove_obstacle(self, obstacle):
+                (x, y) = obstacle.rect.bottomleft
+                self.theObstacles.remove(obstacle)
+                self.item_locations[(x, y)] = Space(x, y)
+                
+        """
 
         def display_high_score(high_score):
                 #displays a high score if available and displays 0 if not available
@@ -157,8 +212,10 @@ class Environment:
                 if self.bunny.rect.colliderect(obstacle):
                         self.bunny.lives -= 1
                 #Remove obstacle
+        """
 
 class Entity(pygame.sprite.Sprite):
+
         def __init__(self):
                 super(Entity, self).__init__()
                 self.name_of_image = ""
@@ -170,33 +227,40 @@ class Entity(pygame.sprite.Sprite):
 
         def set_rect(self):
                 self.rect = pygame.Surface([self.size, self.size]).get_rect()
-                self.rect.topleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM - self.size)
+                self.rect.bottomleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM)
 
         def set_pic(self):
                 self.image = pygame.image.load(self.name_of_image).convert_alpha()
                 self.image = pygame.transform.smoothscale(self.image, (self.size, self.size))
 
 class Bunny(Entity):
+
         def __init__(self):
                 super(Bunny, self).__init__()
                 self.name_of_image = "bunny.png"
                 self.size = BUNNY_SIZE
                 self.set_rect()
-                self.rect.centerx = BORDER_SIZE + WIDTH/2 #Keeps bunny centered at all times
+                self.rect.centerx = BORDER_SIZE + WIDTH/2 # Keeps bunny centered at all times
                 self.set_pic()
 
-                self.lives = 3
+                # self.lives = 3
                 self.carrots = 0
 
-        def bounce(self, bunny_height):
-                #moves the bunny up
-                self.rect.centery += bunny_height
-                self.rect.centery -= bunny_height
+        def bounce(self, bounce_count, height):
+                if bounce_count < height/5:
+                        self.rect.centery -= 10
+                elif bounce_count < 2*height/5:
+                        self.rect.centery -= 5
+                elif bounce_count < 3*height/5:
+                        self.rect.centery +=0
+                elif bounce_count < 4*height/5:
+                        self.rect.centery += 5
+                else:
+                        self.rect.centery += 10
 
 class Obstacle(Entity):
         def __init__(self):
                 super(Obstacle, self).__init__()
-        # tree(different heights), rock, wolf, fire
 
 class Carrot(Obstacle):
         def __init__(self):
@@ -218,7 +282,7 @@ class Tree_Tall(Obstacle):
                 self.name_of_image = "apple-tree.png"
                 self.size = TREE_SIZE
                 self.rect = pygame.Surface([self.size, 2*self.size]).get_rect()
-                self.rect.topleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM - 2*self.size)
+                self.rect.bottomleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM)
                 self.image = pygame.image.load(self.name_of_image).convert_alpha()
                 self.image = pygame.transform.smoothscale(self.image, (self.size, 2*self.size))
 
@@ -249,10 +313,8 @@ class Space(Entity):
                 self.name_of_image = "blank.png"
                 self.size = 1
                 self.set_rect()
-                self.rect.centerx = x
-                self.rect.centery = y
+                self.rect.bottomleft = (x, y)
                 self.set_pic()
 
 if __name__ == "__main__":
         new_game()
-
