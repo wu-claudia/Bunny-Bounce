@@ -25,6 +25,7 @@ TREE_SHORT_SIZE = 100
 ROCK_SIZE = 25
 FIRE_SIZE = 50
 WOLF_SIZE = 75
+<<<<<<< HEAD
 
 """
 Gameplay Variables
@@ -42,6 +43,12 @@ HARDER = 5 # How much POSSIBILITIES decreases per HARDER_TIME time steps
 """
 RGB Color Definitions
 """
+=======
+BOTTOM = HEIGHT * 4/5
+BOUNCE_HEIGHT = 25
+
+# RGB Color Definitions
+>>>>>>> origin/master
 BLACK = (0, 0, 0)
 GREY = (100, 100, 100)
 WHITE = (255, 255, 255)
@@ -83,8 +90,14 @@ def new_game():
 	quit_game()
 
 def main_loop(screen, env):
+<<<<<<< HEAD
 	
 	message = ["carrot number"] # display score = 0
+=======
+
+	end = False
+	message = ["Hello"] # display lives = 3, score = 0
+>>>>>>> origin/master
 	update_screen(screen, env, message)
 	# high_score = 0
 
@@ -114,10 +127,17 @@ def main_loop(screen, env):
 		# Remove items that have reached the left side of the screen.
 		for carrot in env.theCarrots:
 			if carrot.rect.left < BORDER_SIZE:
+<<<<<<< HEAD
 				env.theCarrots.remove(carrot)
 		for obstacle in env.theObstacles:
 			if obstacle.rect.left < BORDER_SIZE:
 				env.theObstacles.remove(obstacle)
+=======
+				env.remove_carrot(carrot)
+		for obstacle in env.theObstacles:
+			if obstacle.rect.left < BORDER_SIZE:
+				env.remove_obstacle(obstacle)
+>>>>>>> origin/master
 
 		# Bounce movement
 		env.bunny.rect.bottom -= velocity # Up = pixel index decreasing
@@ -144,6 +164,7 @@ def main_loop(screen, env):
 		-Randomly choose whether to place an obstacle and which obstacle to place.
 		"""
 
+<<<<<<< HEAD
 		if loop_count % PLACEMENT_TIME == 0:
 
 			env.theCarrots.add(Carrot()) # Place a carrot
@@ -176,6 +197,25 @@ def main_loop(screen, env):
 			loop_count = 0
 			if possibilities > POSSIBILITIES_MIN:
 				possibilities -= HARDER
+=======
+		if loop_count % 10 == 0:
+			#env.place_carrot(Carrot())
+
+			# get a random int, if int = 0, then place obstacle (random_int for which obstacle)
+			num = random.randint(0, 100)
+
+			#Random chances of obstacles appearing
+			if num in range(0, 5):
+				env.place_obstacle(Tree_Tall())
+			elif num in range(5, 10):
+				env.place_obstacle(Tree_Short())
+			elif num in range(10, 20):
+				env.place_obstacle(Rock())
+			elif num in range(20, 25):
+				env.place_obstacle(Fire())
+			elif num in range(25, 35):
+				env.place_obstacle(Wolf())
+>>>>>>> origin/master
 
 		"""
 		Update screen and loop_count before allowing next iteration to run.
@@ -188,6 +228,16 @@ def main_loop(screen, env):
 		if pygame.QUIT in event_types:
 			end = True
 
+<<<<<<< HEAD
+=======
+	message = ["Hello"]
+	update_screen(screen, env, message)
+
+		# if env.bunny.carrots >= high_score:
+	#       with open('saved_state.txt', 'w') as f:
+	#               f.write( str(env.bunny.carrot ) )
+
+>>>>>>> origin/master
 def update_screen(screen, env, message = []):
 	"""
 	Update images and text prompts on the screen.
@@ -220,7 +270,11 @@ def quit_game():
 	sys.exit()
 
 class Environment:
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> origin/master
 	def __init__(self):
 		
 		# Initialize dictionary of locations with objects
@@ -248,6 +302,7 @@ class Environment:
 		self.theObstacles.add(obstacle)
 	
 	def step(self, item):
+<<<<<<< HEAD
 		#(x, y) = item.rect.bottomleft
 		#self.item_locations[(x, y)] = Space(x,y)
 		item.rect.left -= STEP
@@ -265,6 +320,24 @@ class Environment:
 	"""
 
 	#***methods we might need to write***
+	"""
+=======
+		(x, y) = item.rect.bottomleft
+		self.item_locations[(x, y)] = Space(x,y)
+		item.rect.left -= 5
+		self.item_locations[(item.rect.left, y)] = item
+
+	def remove_carrot(self, carrot):
+		(x, y) = carrot.rect.bottomleft
+		self.theCarrots.remove(carrot)
+		self.item_locations[(x, y)] = Space(x, y)
+>>>>>>> origin/master
+
+	def remove_obstacle(self, obstacle):
+		(x, y) = obstacle.rect.bottomleft
+		self.theObstacles.remove(obstacle)
+		self.item_locations[(x, y)] = Space(x, y)
+
 	"""
 
 	def display_high_score(high_score):
@@ -292,6 +365,7 @@ class Environment:
 	"""
 
 class Entity(pygame.sprite.Sprite):
+<<<<<<< HEAD
 
 	"""
 	All items in the game are in this class. Subclasses:
@@ -299,6 +373,8 @@ class Entity(pygame.sprite.Sprite):
 	-Obstacle
 	-Space #***might not need this class***
 	"""
+=======
+>>>>>>> origin/master
 
 	def __init__(self):
 		super(Entity, self).__init__()
@@ -311,7 +387,11 @@ class Entity(pygame.sprite.Sprite):
 
 	def set_rect(self):
 		self.rect = pygame.Surface([self.size, self.size]).get_rect()
+<<<<<<< HEAD
 		self.rect.bottomleft = (BORDER_SIZE + WIDTH - self.size, GROUND)
+=======
+		self.rect.bottomleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM)
+>>>>>>> origin/master
 
 	def set_pic(self):
 		self.image = pygame.image.load(self.name_of_image).convert_alpha()
@@ -330,8 +410,16 @@ class Bunny(Entity):
 		# self.lives = 3 #***additional feature***
 		self.carrots = 0
 
+<<<<<<< HEAD
 	def bounce(self, velocity): #***might not need this method***
 		self.rect.bottom -= velocity
+=======
+	def bounce(self, bounce_count, height):
+		if bounce_count < height:
+			self.rect.centery -= 10
+		else:
+			self.rect.centery += 10
+>>>>>>> origin/master
 
 class Obstacle(Entity):
 	"""
@@ -364,11 +452,19 @@ class Tree_Tall(Obstacle):
 	def __init__(self):
 		super(Tree_Tall, self).__init__()
 		self.name_of_image = "apple-tree.png"
+<<<<<<< HEAD
 		self.size = TREE_TALL_WIDTH
 		self.rect = pygame.Surface([TREE_TALL_WIDTH, TREE_TALL_HEIGHT]).get_rect()
 		self.rect.bottomleft = (BORDER_SIZE + WIDTH - TREE_TALL_WIDTH, GROUND)
 		self.image = pygame.image.load(self.name_of_image).convert_alpha()
 		self.image = pygame.transform.smoothscale(self.image, (TREE_TALL_WIDTH, TREE_TALL_HEIGHT))
+=======
+		self.size = TREE_SIZE
+		self.rect = pygame.Surface([self.size, 2*self.size]).get_rect()
+		self.rect.bottomleft = (BORDER_SIZE + WIDTH - self.size, BOTTOM)
+		self.image = pygame.image.load(self.name_of_image).convert_alpha()
+		self.image = pygame.transform.smoothscale(self.image, (self.size, 2*self.size))
+>>>>>>> origin/master
 
 class Rock(Obstacle):
 	def __init__(self):
@@ -391,7 +487,11 @@ class Wolf(Obstacle):
 		self.size = WOLF_SIZE
 		self.create_image()
 
+<<<<<<< HEAD
 class Space(Entity): #***might not need this class***
+=======
+class Space(Entity):
+>>>>>>> origin/master
 	def __init__(self, x, y):
 		super(Space, self).__init__()
 		self.name_of_image = "blank.png"
