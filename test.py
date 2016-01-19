@@ -91,7 +91,7 @@ def new_game():
 
 def main_loop(screen, env):
 <<<<<<< HEAD
-	
+
 	message = ["carrot number"] # display score = 0
 =======
 
@@ -120,7 +120,7 @@ def main_loop(screen, env):
 
 		# Move all items to the left.
 		for item in env.theCarrots:
-			item.rect.left -= STEP 
+			item.rect.left -= STEP
 		for item in env.theObstacles:
 			item.rect.left -= STEP
 
@@ -187,7 +187,7 @@ def main_loop(screen, env):
 			elif num in range(8, 10):
 				env.theObstacles.add(Wolf())
 				#env.place_obstacle(Wolf()) #***might not need this***
-		
+
 		"""
 		Every HARDER_TIME iterations of the loop, decrease <possibilities>.
 		As <possibilities> decreases, the probability of generating an integer representing
@@ -243,6 +243,7 @@ def update_screen(screen, env, message = []):
 	Update images and text prompts on the screen.
 	"""
 	screen.fill(BLACK) # change color later or insert image
+	self.image = pygame.image.load("background.png").convert_alpha()
 	pygame.draw.lines(screen, WHITE, False, [(BORDER_SIZE, GROUND), (BORDER_SIZE+WIDTH, GROUND)], 1)
 	for _ in range(len(message)):
 		update_text(screen, message, _)
@@ -271,12 +272,12 @@ def quit_game():
 
 class Environment:
 <<<<<<< HEAD
-	
+
 =======
 
 >>>>>>> origin/master
 	def __init__(self):
-		
+
 		# Initialize dictionary of locations with objects
 		#self.item_locations = dict.fromkeys([(x,y) for x in range(WIDTH) for y in range(HEIGHT)], Space(x,y))
 		#***might not need this dictionary***
@@ -300,14 +301,14 @@ class Environment:
 	def place_obstacle(self, obstacle):
 		#self.item_locations[obstacle.rect.bottomleft] = obstacle
 		self.theObstacles.add(obstacle)
-	
+
 	def step(self, item):
 <<<<<<< HEAD
 		#(x, y) = item.rect.bottomleft
 		#self.item_locations[(x, y)] = Space(x,y)
 		item.rect.left -= STEP
 		#self.item_locations[(item.rect.left, y)] = item
-		
+
 	def remove_carrot(self, carrot):
 		#(x, y) = carrot.rect.bottomleft
 		self.theCarrots.remove(carrot)
