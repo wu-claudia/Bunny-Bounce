@@ -1,8 +1,7 @@
 # bunnybounce.py
 # Created 1/17/2016 by Claudia Wu, Illina Yang, Wings Yeung, Diane Zhou
 
-import pygame, sys
-import random
+import pygame, sys, random
 from example_menu import main as menu
 
 """
@@ -11,7 +10,9 @@ Dimensions
 WIDTH = 1000 # game screen width
 HEIGHT = 600 # game screen height
 MESSAGE_WIDTH = 200 # text prompt screen width
-BORDER_SIZE = 10 # border around game screen size
+BORDER_SIZE = 20 # border around game screen size
+WINDOW_SIZE = (WIDTH + MESSAGE_WIDTH + 3*BORDER_SIZE, HEIGHT + 2*BORDER_SIZE)
+TEXT_SIZE = 30 # size of text on screen
 GROUND = HEIGHT * 4/5 # y-position of "ground" in game
 BUNNY_LOC = WIDTH/4 # x-position of the bunny
 
@@ -30,7 +31,7 @@ WOLF_SIZE = 75
 """
 Gameplay Variables
 """
-VELOCITY = 15 # Default initial velocity of bunny bouncing up
+VELOCITY = 10 # Default initial velocity of bunny bouncing up
 ACCELERATION = 1 # Amount velocity decreases per time step
 POWER = 5 # Additional velocity per space bar pressed by player
 PLACEMENT_TIME = 10 # How often carrots show up
@@ -50,26 +51,28 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-def menu_screen():
+def init_game():
+	"""
+	Initialize the game with the menu screen.
+	If the player chooses "Play Game", <menu> method returns "None".
+	"""
 	pygame.init()
-	window_size = (WIDTH + MESSAGE_WIDTH + 3*BORDER_SIZE, HEIGHT + 2*BORDER_SIZE)
-	result = menu(pygame.display.set_mode(window_size)) #Show the menu, and when an option is selected, store the result
-	if result is None: #THIS MEANS USER SELECTED START GAME
-	    new_game(window_size)
-
-def new_game(window_size):
-
-	# Initialize gameplay environment.
-	# pygame.init()
-	# window_size = (WIDTH + MESSAGE_WIDTH + 3*BORDER_SIZE, HEIGHT + 2*BORDER_SIZE)
-	screen = pygame.display.set_mode(window_size)
 	pygame.display.set_caption("Bunny Bounce")
+	if menu(pygame.display.set_mode(WINDOW_SIZE)) is None:
+		new_game()
+
+def new_game():
+
+	# Set up gameplay environment.
+	screen = pygame.display.set_mode(WINDOW_SIZE)
 	env = Environment()
 
 	# Player presses space bar to start the game.
-	message = ["Press space bar to start."]
+	message = ["Press spacebar to"]
+	message.append("start.")
 	update_screen(screen, env, message)
 	start = False
+	score = 0
 	while start is False:
 		events = pygame.event.get()
 		event_types = [event.type for event in events]
@@ -78,7 +81,7 @@ def new_game(window_size):
 				start = True
 				main_loop(screen, env)
 		elif pygame.QUIT in event_types:
-			break
+			quit_game()
 
 	#***additional feature to do if time
 	"""
@@ -87,12 +90,12 @@ def new_game(window_size):
 	#               f.write( str(env.bunny.carrot ) )
 	"""
 
-	quit_game()
-
 def main_loop(screen, env):
-	message = ["carrot number"] # display score = 0
+
+	message = ["Score: 0"]
+	# high score = # read from file
+	# message.append = ["High score: " + str(high_score)]
 	update_screen(screen, env, message)
-	# high_score = 0
 
 	loop_count = 0 # Keeps track of number of iterations of loop below
 
@@ -101,8 +104,7 @@ def main_loop(screen, env):
 	new_velocity = VELOCITY
 	possibilities = POSSIBILITIES
 
-	end = False
-	while end is False:
+	while 1:
 
 		"""
 		Every iteration of the loop:
@@ -126,12 +128,17 @@ def main_loop(screen, env):
 			if obstacle.rect.left < BORDER_SIZE:
 				env.theObstacles.remove(obstacle)
 
-		# Check for collision with carrots and obstacles.
+		# Check for collision with carrots. Update score as necessary.
 		if env.collision_carrot():
 			env.bunny.score += 1
-			message = ["Score: " + str(env.bunny.score)]
+			message[0] = "Score: " + str(env.bunny.score)
+
+		# Check for collision with obstacles.
+		# Game ends if there is collision.
 		if env.collision_obstacle():
-			end = True
+			end_game(screen, env)
+			return
+
 		# Bounce movement
 		env.bunny.rect.bottom -= velocity # Up = pixel index decreasing
 		velocity -= ACCELERATION # Velocity decreases after each time step (think physics & gravity)
@@ -148,7 +155,7 @@ def main_loop(screen, env):
 			if events[0].key == pygame.K_SPACE:
 				new_velocity += POWER
 		elif pygame.QUIT in event_types:
-			end = True
+			quit_game()
 
 		"""
 		Every PLACEMENT_TIME iterations of the loop:
@@ -198,14 +205,13 @@ def main_loop(screen, env):
 		events = pygame.event.get()
 		event_types = [event.type for event in events]
 		if pygame.QUIT in event_types:
-			end = True
+			quit_game()
 
 def update_screen(screen, env, message = []):
 	"""
 	Update images and text prompts on the screen.
 	"""
 	screen.fill(BLACK)
-	pygame.draw.lines(screen, WHITE, False, [(BORDER_SIZE, GROUND), (BORDER_SIZE+WIDTH, GROUND)], 1)
 	for _ in range(len(message)):
 		update_text(screen, message, _)
 	env.theBackground.draw(screen)
@@ -218,12 +224,41 @@ def update_text(screen, message, index, textSize = 20):
 	"""
 	Update the image of the text on the screen.
 	"""
-	font = pygame.font.Font(None, textSize)
+	font = pygame.font.Font(None, TEXT_SIZE)
 	text = font.render(message[index], True, WHITE, BLACK)
 	textRect = text.get_rect()
 	textRect.x = WIDTH + 2*BORDER_SIZE
-	textRect.y = textSize
+	textRect.y = (index+1) * TEXT_SIZE
 	screen.blit(text, textRect)
+
+def end_game(screen, env):
+
+	"""
+	When the game ends:
+	-Display the player's score. #and the high score ***additional feature***
+	-Allow the player to play again or quit.
+	"""
+
+	message = ["Your score: " + str(env.bunny.score)]
+	# message.append("High score: " + # high score) ***additional feature***
+	message.append("")
+	message.append("Press spacebar to ")
+	message.append("play again.")
+	message.append("")
+	message.append("Close window to ")
+	message.append("quit.")
+	update_screen(screen, env, message)
+	
+	response = False
+	while response is False:
+		events = pygame.event.get()
+		event_types = [event.type for event in events]
+		if pygame.KEYDOWN in event_types:
+			if events[0].key == pygame.K_SPACE:
+				new_game()
+				response = True
+		elif pygame.QUIT in event_types:
+			quit_game()
 
 def quit_game():
 	"""
@@ -233,6 +268,7 @@ def quit_game():
 	sys.exit()
 
 class Environment:
+
 	def __init__(self):
 
 		# Sprite groups of all entities
@@ -386,5 +422,4 @@ class Wolf(Obstacle):
 		self.create_image()
 
 if __name__ == "__main__":
-	#new_game()
-	menu_screen()
+	init_game()

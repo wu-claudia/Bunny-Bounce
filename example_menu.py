@@ -1,3 +1,9 @@
+"""
+1/20/2016
+-Changed "Start Game" to "Play Game"
+-Commented out print functions
+"""
+
 #! /usr/bin/python
 
 ## \file  example_simple.py
@@ -56,7 +62,8 @@ def main(screen):
    # understand the input factors, see the menu file
    pygame.display.set_caption("Bunny Bounce")
    menu = cMenu(50, 50, 20, 5, 'vertical', 100, screen,
-               [('Start Game', 1, None),
+               [# ('Start Game', 1, None),
+                  ('Play Game', 1, None),
                 # ('Load Game',  2, None),
                 # ('Instructions',    3, None),
                 ('Exit',       4, None)])
@@ -99,7 +106,7 @@ def main(screen):
          if state == 0:
             rect_list, state = menu.update(e, state)
          elif state == 1:
-            print 'Start Game!'
+            # print 'Start Game!'
             state = 0
             return
         #  elif state == 2:
@@ -111,7 +118,7 @@ def main(screen):
         #     open('instructions.txt')
         #     state = 0
          else:
-            print 'Exit!'
+            # print 'Exit!'
             pygame.quit()
             sys.exit()
 
