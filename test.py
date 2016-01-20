@@ -192,10 +192,10 @@ def update_screen(screen, env, message = []):
 	Update images and text prompts on the screen.
 	"""
 	screen.fill(BLACK) # change color later or insert image
-	self.image = pygame.image.load("background.png").convert_alpha()
 	pygame.draw.lines(screen, WHITE, False, [(BORDER_SIZE, GROUND), (BORDER_SIZE+WIDTH, GROUND)], 1)
 	for _ in range(len(message)):
 		update_text(screen, message, _)
+	env.theBackground.draw(screen)
 	env.theCarrots.draw(screen)
 	env.theObstacles.draw(screen)
 	env.theBunny.draw(screen)
@@ -230,11 +230,23 @@ class Environment:
 		self.theCarrots = pygame.sprite.Group()
 		self.theObstacles = pygame.sprite.Group()
 		self.theBunny = pygame.sprite.Group()
+		self.theBackground = pygame.sprite.Group()
 
 		# Add the bunny to the environment
 		self.bunny = Bunny()
 		#self.item_locations[self.bunny.rect.bottomleft] = self.bunny
 		self.theBunny.add(self.bunny)
+
+		# Add the background to the environment
+		self.add_background()
+
+	def add_background(self):
+		background = Entity()
+		background.rect = pygame.Surface([WIDTH, HEIGHT]).get_rect()
+		background.rect.topleft = (BORDER_SIZE, BORDER_SIZE)
+		background.image = pygame.image.load("background.png").convert_alpha()
+		background.image = pygame.transform.smoothscale(background.image, (WIDTH, HEIGHT))
+		self.theBackground.add(background.image)
 
 	#***might not need these methods***
 	"""
@@ -401,3 +413,4 @@ class Space(Entity): #***might not need this class***
 
 if __name__ == "__main__":
 	new_game()
+
