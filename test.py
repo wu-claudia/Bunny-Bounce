@@ -246,7 +246,7 @@ class Environment:
 		background.rect.topleft = (BORDER_SIZE, BORDER_SIZE)
 		background.image = pygame.image.load("background.png").convert_alpha()
 		background.image = pygame.transform.smoothscale(background.image, (WIDTH, HEIGHT))
-		self.theBackground.add(background.image)
+		self.theBackground.add(background)
 
 	#***might not need these methods***
 	"""
