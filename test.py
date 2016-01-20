@@ -22,7 +22,7 @@ CARROT_SIZE = 50
 TREE_TALL_WIDTH = 150
 TREE_TALL_HEIGHT = 200
 TREE_SHORT_SIZE = 100
-ROCK_SIZE = 25
+ROCK_SIZE = 50
 FIRE_SIZE = 50
 WOLF_SIZE = 75
 
@@ -123,7 +123,8 @@ def main_loop(screen, env):
 		if env.collision_carrot():
 			env.bunny.score += 1
 			message = ["Score: " + str(env.bunny.score)]
-
+		if env.collision_obstacle():
+			end = True
 		# Bounce movement
 		env.bunny.rect.bottom -= velocity # Up = pixel index decreasing
 		velocity -= ACCELERATION # Velocity decreases after each time step (think physics & gravity)
@@ -196,7 +197,7 @@ def update_screen(screen, env, message = []):
 	"""
 	Update images and text prompts on the screen.
 	"""
-	screen.fill(BLACK) # change color later or insert image
+	screen.fill(BLACK)
 	pygame.draw.lines(screen, WHITE, False, [(BORDER_SIZE, GROUND), (BORDER_SIZE+WIDTH, GROUND)], 1)
 	for _ in range(len(message)):
 		update_text(screen, message, _)
@@ -250,14 +251,22 @@ class Environment:
 		self.theBackground.add(background)
 
 	"""
-	Check for collision between bunny and carrots.
+	Check for collision between bunny and items (carrots and obstacles).
 	"""
+
 	def collision_carrot(self):
 		carrots = [carrot.rect for carrot in self.theCarrots]
 		index = self.bunny.rect.collidelist(carrots)
-		print index
 		if index != -1:
 			self.theCarrots.remove(self.theCarrots.sprites()[index])
+			return True
+		return False
+
+	def collision_obstacle(self):
+		obstacles = [obstacle.rect for obstacle in self.theObstacles]
+		index = self.bunny.rect.collidelist(obstacles)
+		if index != -1:
+			self.theObstacles.remove(self.theObstacles.sprites()[index])
 			return True
 		return False
 
@@ -267,14 +276,6 @@ class Environment:
 	def display_high_score(high_score):
 		#displays a high score if available and displays 0 if not available
 		pass
-
-	def display_lives(lives_left):
-		#displays the amount of lives left
-		pass
-
-	def bounce_bunny(bounce_height):
-		#takes in a value from the Bunny class to see how high the bunny character will bounce
-		self.bunny.bounce(bounce_height)
 	"""
 
 class Entity(pygame.sprite.Sprite):
@@ -379,4 +380,6 @@ class Wolf(Obstacle):
 
 if __name__ == "__main__":
 	new_game()
+
+
 
