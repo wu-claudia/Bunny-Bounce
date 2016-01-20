@@ -100,6 +100,7 @@ def main_loop(screen, env):
 		"""
 		Every iteration of the loop:
 		-Move all carrots and obstacles to the left.
+		-Check for collision with carrots and obstacles.
 		-Check for player input.
 		-Bunny bounce movement.
 		"""
@@ -118,9 +119,13 @@ def main_loop(screen, env):
 			if obstacle.rect.left < BORDER_SIZE:
 				env.theObstacles.remove(obstacle)
 
+		# Check for collision with carrots and obstacles.
+		if env.collision_carrot():
+			env.bunny.score += 1
+			message = ["Score: " + str(env.bunny.score)]
+
 		# Bounce movement
 		env.bunny.rect.bottom -= velocity # Up = pixel index decreasing
-		#env.bunny.bounce(velocity) #***might not need this***
 		velocity -= ACCELERATION # Velocity decreases after each time step (think physics & gravity)
 		if env.bunny.rect.bottom >= GROUND: # Reset velocity when bunny reaches ground
 			velocity = new_velocity
@@ -222,10 +227,6 @@ def quit_game():
 class Environment:
 	def __init__(self):
 
-		# Initialize dictionary of locations with objects
-		#self.item_locations = dict.fromkeys([(x,y) for x in range(WIDTH) for y in range(HEIGHT)], Space(x,y))
-		#***might not need this dictionary***
-
 		# Sprite groups of all entities
 		self.theCarrots = pygame.sprite.Group()
 		self.theObstacles = pygame.sprite.Group()
@@ -248,32 +249,17 @@ class Environment:
 		background.image = pygame.transform.smoothscale(background.image, (WIDTH, HEIGHT))
 		self.theBackground.add(background)
 
-	#***might not need these methods***
 	"""
-	def place_carrot(self, carrot):
-		#self.item_locations[carrot.rect.bottomleft] = carrot
-		self.theCarrots.add(carrot)
-
-	def place_obstacle(self, obstacle):
-		#self.item_locations[obstacle.rect.bottomleft] = obstacle
-		self.theObstacles.add(obstacle)
-
-	def step(self, item):
-		#(x, y) = item.rect.bottomleft
-		#self.item_locations[(x, y)] = Space(x,y)
-		item.rect.left -= STEP
-		#self.item_locations[(item.rect.left, y)] = item
-
-	def remove_carrot(self, carrot):
-		#(x, y) = carrot.rect.bottomleft
-		self.theCarrots.remove(carrot)
-		#self.item_locations[(x, y)] = Space(x, y)
-
-	def remove_obstacle(self, obstacle):
-		#(x, y) = obstacle.rect.bottomleft
-		self.theObstacles.remove(obstacle)
-		#self.item_locations[(x, y)] = Space(x, y)
+	Check for collision between bunny and carrots.
 	"""
+	def collision_carrot(self):
+		carrots = [carrot.rect for carrot in self.theCarrots]
+		index = self.bunny.rect.collidelist(carrots)
+		print index
+		if index != -1:
+			self.theCarrots.remove(self.theCarrots.sprites()[index])
+			return True
+		return False
 
 	#***methods we might need to write***
 	"""
@@ -289,17 +275,6 @@ class Environment:
 	def bounce_bunny(bounce_height):
 		#takes in a value from the Bunny class to see how high the bunny character will bounce
 		self.bunny.bounce(bounce_height)
-
-	def check_collision(bunny, score):
-		#checks to see what it is colliding with
-		carrot = Carrot()
-		obstacle = Obstacle()
-		if self.bunny.rect.colliderect(carrot):
-			self.bunny.carrots += 1
-		#Remove carrot
-		if self.bunny.rect.colliderect(obstacle):
-			self.bunny.lives -= 1
-		#Remove obstacle
 	"""
 
 class Entity(pygame.sprite.Sprite):
@@ -339,7 +314,7 @@ class Bunny(Entity):
 		self.set_pic()
 
 		# self.lives = 3 #***additional feature***
-		self.carrots = 0
+		self.score = 0 # corresponds to number of carrots collected
 
 	def bounce(self, velocity): #***might not need this method***
 		self.rect.bottom -= velocity
@@ -401,15 +376,6 @@ class Wolf(Obstacle):
 		self.name_of_image = "wolf.png"
 		self.size = WOLF_SIZE
 		self.create_image()
-
-class Space(Entity): #***might not need this class***
-	def __init__(self, x, y):
-		super(Space, self).__init__()
-		self.name_of_image = "blank.png"
-		self.size = 1
-		self.set_rect()
-		self.rect.bottomleft = (x, y)
-		self.set_pic()
 
 if __name__ == "__main__":
 	new_game()
