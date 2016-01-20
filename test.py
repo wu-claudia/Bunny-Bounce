@@ -83,12 +83,6 @@ def new_game():
 	quit_game()
 
 def main_loop(screen, env):
-<<<<<<< HEAD
-	
-=======
-<<<<<<< HEAD
-
->>>>>>> origin/master
 	message = ["carrot number"] # display score = 0
 	update_screen(screen, env, message)
 	# high_score = 0
@@ -226,15 +220,6 @@ def quit_game():
 	sys.exit()
 
 class Environment:
-<<<<<<< HEAD
-	
-=======
-<<<<<<< HEAD
-
-=======
-
->>>>>>> origin/master
->>>>>>> origin/master
 	def __init__(self):
 
 		# Initialize dictionary of locations with objects
