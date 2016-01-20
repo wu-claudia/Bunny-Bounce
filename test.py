@@ -3,6 +3,7 @@
 
 import pygame, sys
 import random
+from example_menu import main as menu
 
 """
 Dimensions
@@ -49,12 +50,18 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-
-def new_game():
-
-	# Initialize gameplay environment.
+def menu_screen():
 	pygame.init()
 	window_size = (WIDTH + MESSAGE_WIDTH + 3*BORDER_SIZE, HEIGHT + 2*BORDER_SIZE)
+	result = menu(pygame.display.set_mode(window_size)) #Show the menu, and when an option is selected, store the result
+	if result is None: #THIS MEANS USER SELECTED START GAME
+	    new_game(window_size)
+
+def new_game(window_size):
+
+	# Initialize gameplay environment.
+	# pygame.init()
+	# window_size = (WIDTH + MESSAGE_WIDTH + 3*BORDER_SIZE, HEIGHT + 2*BORDER_SIZE)
 	screen = pygame.display.set_mode(window_size)
 	pygame.display.set_caption("Bunny Bounce")
 	env = Environment()
@@ -379,7 +386,5 @@ class Wolf(Obstacle):
 		self.create_image()
 
 if __name__ == "__main__":
-	new_game()
-
-
-
+	#new_game()
+	menu_screen()
