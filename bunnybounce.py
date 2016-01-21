@@ -33,7 +33,7 @@ Gameplay Variables
 """
 VELOCITY = 10 # Default initial velocity of bunny bouncing up
 ACCELERATION = 1 # Amount velocity decreases per time step
-POWER = 5 # Additional velocity per space bar pressed by player
+POWER = 5 # Additional velocity per spacebar pressed by player
 PLACEMENT_TIME = 10 # How often carrots show up
 STEP = 7 # Number of pixels carrots and obstacles move per time step
 POSSIBILITIES = 100 # The smaller this number (a denominator), the more often obstacles show up
@@ -67,7 +67,11 @@ def new_game():
 	screen = pygame.display.set_mode(WINDOW_SIZE)
 	env = Environment()
 
-	# Player presses space bar to start the game.
+	# Pass in previous highest score.
+	with open('saved_state.txt', 'r') as f:
+		high_score = f.readline()
+
+	# Player presses spacebar to start the game.
 	message = ["Press spacebar to"]
 	message.append("start.")
 	update_screen(screen, env, message)
@@ -79,22 +83,14 @@ def new_game():
 		if pygame.KEYDOWN in event_types:
 			if events[0].key == pygame.K_SPACE:
 				start = True
-				main_loop(screen, env)
+				main_loop(screen, env, high_score)
 		elif pygame.QUIT in event_types:
 			quit_game()
 
-	#***additional feature to do if time
-	"""
-	if env.bunny.carrots >= high_score:
-	#       with open('saved_state.txt', 'w') as f:
-	#               f.write( str(env.bunny.carrot ) )
-	"""
+def main_loop(screen, env, high_score):
 
-def main_loop(screen, env):
-
-	message = ["Score: 0"]
-	# high score = # read from file
-	# message.append = ["High score: " + str(high_score)]
+	message = ["Current Score: 0"]
+	message.append("High Score: " + str(high_score))
 	update_screen(screen, env, message)
 
 	loop_count = 0 # Keeps track of number of iterations of loop below
@@ -131,12 +127,12 @@ def main_loop(screen, env):
 		# Check for collision with carrots. Update score as necessary.
 		if env.collision_carrot():
 			env.bunny.score += 1
-			message[0] = "Score: " + str(env.bunny.score)
+			message[0] = "Current Score: " + str(env.bunny.score)
 
 		# Check for collision with obstacles.
 		# Game ends if there is collision.
 		if env.collision_obstacle():
-			end_game(screen, env)
+			end_game(screen, env, high_score)
 			return
 
 		# Bounce movement
@@ -148,12 +144,14 @@ def main_loop(screen, env):
 
 		update_screen(screen, env, message)
 
-		# If player presses space bar, next bounce will be higher.
+		# If player presses spacebar, next bounce will be higher.
 		events = pygame.event.get()
 		event_types = [event.type for event in events]
 		if pygame.KEYDOWN in event_types:
-			if events[0].key == pygame.K_SPACE:
-				new_velocity += POWER
+			for action in events:
+				if action.key == pygame.K_SPACE:
+					new_velocity += POWER
+					break
 		elif pygame.QUIT in event_types:
 			quit_game()
 
@@ -231,7 +229,7 @@ def update_text(screen, message, index, textSize = 20):
 	textRect.y = (index+1) * TEXT_SIZE
 	screen.blit(text, textRect)
 
-def end_game(screen, env):
+def end_game(screen, env, high_score):
 
 	"""
 	When the game ends:
@@ -240,7 +238,12 @@ def end_game(screen, env):
 	"""
 
 	message = ["Your score: " + str(env.bunny.score)]
-	# message.append("High score: " + # high score) ***additional feature***
+	if env.bunny.score > high_score:
+		message.append("New high score!")
+		with open('saved_state.txt', 'w') as f:
+			f.write( str(env.bunny.score ) )
+	else:
+		message.append("High score: " + str(high_score))
 	message.append("")
 	message.append("Press spacebar to ")
 	message.append("play again.")
@@ -423,3 +426,6 @@ class Wolf(Obstacle):
 
 if __name__ == "__main__":
 	init_game()
+
+
+
