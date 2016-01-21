@@ -69,7 +69,7 @@ def new_game():
 
 	# Pass in previous highest score.
 	with open('saved_state.txt', 'r') as f:
-		high_score = f.readline()
+		high_score = int(f.readline())
 
 	# Player presses spacebar to start the game.
 	message = ["Press spacebar to"]
@@ -128,6 +128,8 @@ def main_loop(screen, env, high_score):
 		if env.collision_carrot():
 			env.bunny.score += 1
 			message[0] = "Current Score: " + str(env.bunny.score)
+			if env.bunny.score > high_score:
+				message[1] = "High Score: " + str(env.bunny.score)
 
 		# Check for collision with obstacles.
 		# Game ends if there is collision.
