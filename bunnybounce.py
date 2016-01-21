@@ -36,10 +36,11 @@ ACCELERATION = 1 # Amount velocity decreases per time step
 POWER = 5 # Additional velocity per spacebar pressed by player
 PLACEMENT_TIME = 10 # How often carrots show up
 STEP = 7 # Number of pixels carrots and obstacles move per time step
-POSSIBILITIES = 100 # The smaller this number (a denominator), the more often obstacles show up
-POSSIBILITIES_MIN = 20
+POSSIBILITIES_INIT = 100 # Corresponds with the easiest level
+# The smaller the <possibiities> variable (a denominator), the more often obstacles show up
+POSSIBILITIES_MIN = 20 # Corresponds with the hardest level
 HARDER_TIME = 200 # How often the game gets harder (more obstacles show up)
-HARDER = 5 # How much POSSIBILITIES decreases per HARDER_TIME time steps
+HARDER = 5 # How much <possibilities> variable decreases per HARDER_TIME time steps
 
 """
 RGB Color Definitions
@@ -71,12 +72,26 @@ def new_game():
 	with open('saved_state.txt', 'r') as f:
 		high_score = int(f.readline())
 
+	# Let the player know how the game works.
+	message = ["Gameplay:"]
+	message.append("-Press spacebar to ")
+	message.append(" make bunny's next ")
+	message.append(" bounce higher than")
+	message.append(" normal.")
+	message.append("-Collect as many ")
+	message.append(" carrots as possible.")
+	message.append(" Avoid obstacles. ")
+	message.append("-Score is number of ")
+	message.append(" carrots collected.")
+	message.append("-Game ends when ")
+	message.append(" bunny hits obstacle.")
+	message.append("")
+
 	# Player presses spacebar to start the game.
-	message = ["Press spacebar to"]
-	message.append("start.")
+	message.append("Press spacebar to ")
+	message.append("start game.")
 	update_screen(screen, env, message)
 	start = False
-	score = 0
 	while start is False:
 		events = pygame.event.get()
 		event_types = [event.type for event in events]
@@ -98,7 +113,7 @@ def main_loop(screen, env, high_score):
 	# Initialize variables with default / initial values
 	velocity = VELOCITY
 	new_velocity = VELOCITY
-	possibilities = POSSIBILITIES
+	possibilities = POSSIBILITIES_INIT
 
 	while 1:
 
@@ -166,25 +181,19 @@ def main_loop(screen, env, high_score):
 		if loop_count % PLACEMENT_TIME == 0:
 
 			env.theCarrots.add(Carrot()) # Place a carrot
-			#env.place_carrot(Carrot()) #***might not need this***
 
 			# The result of a random integer determines which obstacle, if any, shows up.
 			num = random.randint(0, possibilities)
 			if num in range(0, 1):
 				env.theObstacles.add(Tree_Tall())
-				#env.place_obstacle(Tree_Tall()) #***might not need this***
 			elif num in range(1, 3):
 				env.theObstacles.add(Tree_Short())
-				#env.place_obstacle(Tree_Short()) #***might not need this***
 			elif num in range(3, 6):
 				env.theObstacles.add(Rock())
-				#env.place_obstacle(Rock()) #***might not need this***
 			elif num in range(6, 8):
 				env.theObstacles.add(Fire())
-				#env.place_obstacle(Fire()) #***might not need this***
 			elif num in range(8, 10):
 				env.theObstacles.add(Wolf())
-				#env.place_obstacle(Wolf()) #***might not need this***
 
 		"""
 		Every HARDER_TIME iterations of the loop, decrease <possibilities>.
@@ -235,13 +244,13 @@ def end_game(screen, env, high_score):
 
 	"""
 	When the game ends:
-	-Display the player's score. #and the high score ***additional feature***
+	-Display the player's score and the high score.
 	-Allow the player to play again or quit.
 	"""
 
-	message = ["Your score: " + str(env.bunny.score)]
+	message = ["Game over."]
+	message.append("Your score: " + str(env.bunny.score))
 	if env.bunny.score > high_score:
-		message.append("New high score!")
 		with open('saved_state.txt', 'w') as f:
 			f.write( str(env.bunny.score ) )
 	else:
@@ -284,7 +293,6 @@ class Environment:
 
 		# Add the bunny to the environment
 		self.bunny = Bunny()
-		#self.item_locations[self.bunny.rect.bottomleft] = self.bunny
 		self.theBunny.add(self.bunny)
 
 		# Add the background to the environment
@@ -318,21 +326,12 @@ class Environment:
 			return True
 		return False
 
-	#***methods we might need to write***
-	"""
-
-	def display_high_score(high_score):
-		#displays a high score if available and displays 0 if not available
-		pass
-	"""
-
 class Entity(pygame.sprite.Sprite):
 
 	"""
 	All items in the game are in this class. Subclasses:
 	-Bunny
 	-Obstacle
-	-Space #***might not need this class***
 	"""
 
 	def __init__(self):
@@ -362,11 +361,7 @@ class Bunny(Entity):
 		self.rect.centerx = BORDER_SIZE + BUNNY_LOC
 		self.set_pic()
 
-		# self.lives = 3 #***additional feature***
 		self.score = 0 # corresponds to number of carrots collected
-
-	def bounce(self, velocity): #***might not need this method***
-		self.rect.bottom -= velocity
 
 class Obstacle(Entity):
 	"""
@@ -428,6 +423,3 @@ class Wolf(Obstacle):
 
 if __name__ == "__main__":
 	init_game()
-
-
-
